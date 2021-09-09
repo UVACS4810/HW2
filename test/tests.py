@@ -1,5 +1,7 @@
 from math import exp
 import unittest
+
+import numpy as np
 import src.vertex as vertex
 import src.file_parse as file_parse
 import src.utils as utils
@@ -80,7 +82,7 @@ class TestFileParse(unittest.TestCase):
         # test to enseure that only the smaller endpoint will be included
         p1 = vertex.Vertex(10, 10)
         p2 = vertex.Vertex(20, 20)
-        output = file_parse.dda(p1, p2)
+        output = file_parse.dda_on_vertex(p1, p2)
         has_x_10: bool = False
         has_y_10: bool = False
         for out in output:
@@ -105,7 +107,7 @@ class TestFileParse(unittest.TestCase):
             vertex.Vertex(0,3),
             vertex.Vertex(0,4),
         ]
-        actual = file_parse.dda(p1, p2)
+        actual = file_parse.dda_on_vertex(p1, p2)
         self.assertEqual(actual, expected)
         p1 = vertex.Vertex(0,.1)
         p2 = vertex.Vertex(0,5)
@@ -115,7 +117,7 @@ class TestFileParse(unittest.TestCase):
             vertex.Vertex(0,3),
             vertex.Vertex(0,4),
         ]
-        actual = file_parse.dda(p1, p2)
+        actual = file_parse.dda_on_vertex(p1, p2)
         self.assertEqual(actual, expected)
 
         p1 = vertex.Vertex(0,0)
@@ -127,7 +129,39 @@ class TestFileParse(unittest.TestCase):
             vertex.Vertex(3, 0),
             vertex.Vertex(4, 0),
         ]
-        actual = file_parse.dda(p1, p2)
+        actual = file_parse.dda_on_vertex(p1, p2)
         self.assertEqual(actual, expected)
 
+        p1 = vertex.Vertex(0,0)
+        p2 = vertex.Vertex(0,0)
+        expected = []
+        actual = file_parse.dda_on_vertex(p1, p2)
+        self.assertEqual(actual, expected)
 
+    def test_vertex_to_ndarray(self):
+        v = vertex.Vertex(1,1)
+        l = [1,1,0,0,0]
+        ll = np.array(l)
+        self.assertEqual(ll.all(), file_parse.vertex_to_ndarray(v).all())
+
+    def test_triangle_fill(self):
+        p1 = vertex.Vertex(1,1)
+        p2 = vertex.Vertex(1,3)
+        p3 = vertex.Vertex(3,1)
+        t_points = file_parse.triangle_fill(p1,p2,p3)
+        print(t_points)
+        expected = [
+            vertex.Vertex(x=1, y=1, r=0, g=0, b=0),
+            vertex.Vertex(x=2, y=1, r=0, g=0, b=0),
+            vertex.Vertex(x=1, y=2, r=0, g=0, b=0)
+        ]
+        self.assertEqual(t_points, expected)
+
+    def test_triangle_fill_wil_zeroes(self):
+        p1 = vertex.Vertex(0,0)
+        p2 = vertex.Vertex(0,0)
+        p3 = vertex.Vertex(0,0)
+        t_points = file_parse.triangle_fill(p1,p2,p3)
+        print(t_points)
+        expected = []
+        self.assertEqual(t_points, expected)
