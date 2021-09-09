@@ -1,21 +1,52 @@
+from math import exp
 import unittest
-import src.main as main
 import src.vertex as vertex
 import src.file_parse as file_parse
 import src.utils as utils
 
-class Test(unittest.TestCase):
+
+class TestVertex(unittest.TestCase):
+    def test_vertex_class(self):
+        hex_val = "#ff0000" # this hex converts to 255, 0, 0
+        r = 255
+        g, b, x, y = 0, 0, 0, 0
+        p1 = vertex.Vertex(x, y, r, g, b)
+        p2 = vertex.vertex_from_xyc(x, y, hex_val)
+        self.assertEqual(p1, p2)
+    
+    def test_convert_vertex_to_list(self):
+        r = 255
+        g, b, x, y = 0, 0, 0, 0
+        p1 = vertex.Vertex(x, y, r, g, b)
+        p1_as_list = utils.object_to_list(p1)
+        fields = [r, g, b, x, y]
+        for field in fields:
+            self.assertIn(field, p1_as_list)
+        
+class TestUtils(unittest.TestCase):
+    def test_convert_hex_to_rgb(self):
+        hex_color = "#aaaaff"
+        rgb: utils.RGB = utils.RGB(170, 170, 255)
+        self.assertEqual(utils.convert_hex_to_rgb(hex_color), rgb)
+    
+    def test_add_RGB(self):
+        c1 = utils.RGB(1, 1, 1)
+        c2 = utils.RGB(1, 1, 1)
+        expected = utils.RGB(2, 2, 2)
+        self.assertEqual(c1 + c2, expected)
+        # check overflow behavior
+    
     def test_make_filename_list(self):
         # case with one image
         expected = ["whatnot.png"]
         image_info = file_parse.ImageInfo(filename="whatnot.png", width=1, height=1)
-        self.assertEqual(expected, main.make_filename_list(image_info=image_info))
+        self.assertEqual(expected, utils.make_filename_list(image_info=image_info))
 
         expected = ["whatnot000.png"]
         image_info.filename="whatnot"
         image_info.number_of_images= len(expected)
         image_info.is_single_file = False
-        self.assertEqual(expected, main.make_filename_list(image_info=image_info))
+        self.assertEqual(expected, utils.make_filename_list(image_info=image_info))
 
         # case with 5 images
         expected = [
@@ -26,23 +57,9 @@ class Test(unittest.TestCase):
             "whatnot004.png",
         ]
         image_info.number_of_images = len(expected)
-        actual = main.make_filename_list(image_info=image_info)
+        actual = utils.make_filename_list(image_info=image_info)
         self.assertEqual(expected, actual)
-
-class TestVertex(unittest.TestCase):
-    def test_point_class(self):
-        hex_val = "#ff0000" # this hex converts to 255, 0, 0
-        r = 255
-        g, b, x, y = 0, 0, 0, 0
-        p1 = vertex.vertex_from_xyrgb(x, y, r, g, b)
-        p2 = vertex.vertex_from_xyc(x, y, hex_val)
-        self.assertEqual(p1, p2)
         
-class TestUtils(unittest.TestCase):
-    def test_convert_hex_to_rgb(self):
-        hex_color = "#aaaaff"
-        rgb: utils.RGB = utils.RGB(170, 170, 255)
-        self.assertEqual(utils.convert_hex_to_rgb(hex_color), rgb)
 
 class TestFileParse(unittest.TestCase):
     def test_line_to_list(self):
@@ -57,3 +74,60 @@ class TestFileParse(unittest.TestCase):
         for line in lines:
             out = file_parse.line_to_list(line)
             self.assertEqual(out, expected)
+
+
+    def test_dda(self):
+        # test to enseure that only the smaller endpoint will be included
+        p1 = vertex.Vertex(10, 10)
+        p2 = vertex.Vertex(20, 20)
+        output = file_parse.dda(p1, p2)
+        has_x_10: bool = False
+        has_y_10: bool = False
+        for out in output:
+            if out.x == 10:
+                has_x_10 = True
+            if out.x == 20:
+                self.fail("should not contain a vertex with x=20")
+            if out.y == 10:
+                has_y_10 = True
+            if out.y == 20:
+                self.fail("should not contain a vertex with y=20")
+        self.assertTrue(has_x_10)
+        self.assertTrue(has_y_10)
+
+        # tests to ensure accuracy
+        p1 = vertex.Vertex(0,0)
+        p2 = vertex.Vertex(0,5)
+        expected = [
+            vertex.Vertex(0,0),
+            vertex.Vertex(0,1),
+            vertex.Vertex(0,2),
+            vertex.Vertex(0,3),
+            vertex.Vertex(0,4),
+        ]
+        actual = file_parse.dda(p1, p2)
+        self.assertEqual(actual, expected)
+        p1 = vertex.Vertex(0,.1)
+        p2 = vertex.Vertex(0,5)
+        expected = [
+            vertex.Vertex(0,1),
+            vertex.Vertex(0,2),
+            vertex.Vertex(0,3),
+            vertex.Vertex(0,4),
+        ]
+        actual = file_parse.dda(p1, p2)
+        self.assertEqual(actual, expected)
+
+        p1 = vertex.Vertex(0,0)
+        p2 = vertex.Vertex(5,0)
+        expected = [
+            vertex.Vertex(0, 0),
+            vertex.Vertex(1, 0),
+            vertex.Vertex(2, 0),
+            vertex.Vertex(3, 0),
+            vertex.Vertex(4, 0),
+        ]
+        actual = file_parse.dda(p1, p2)
+        self.assertEqual(actual, expected)
+
+

@@ -1,0 +1,9 @@
+png 30 30 brown.png
+
+xyrgb 15 15 0 0 0
+xyrgb 0 15 0 0 0
+xyrgb 15 0 0 0 0
+xyrgb 29 20.6 0 0 0
+xyrgb 20.3 29 0 0 0
+
+linec 4 5 #ca8642

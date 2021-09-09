@@ -5,7 +5,7 @@ PYTHON = $(VENV)/bin/python3
 PIP = $(VENV)/bin/pip
 
 run: $(VENV)/bin/activate
-	$(PYTHON) src/main.py $(file)
+	$(PYTHON) main.py $(file)
 
 
 $(VENV)/bin/activate: requirements.txt
