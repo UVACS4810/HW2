@@ -15,6 +15,8 @@ class TestVertex(unittest.TestCase):
         p1 = vertex.Vertex(x, y, r, g, b)
         p2 = vertex.vertex_from_xyc(x, y, hex_val)
         self.assertEqual(p1, p2)
+        
+        # Test that we can convert hex with alpha values
     
     def test_convert_vertex_to_list(self):
         r = 255
@@ -29,6 +31,10 @@ class TestUtils(unittest.TestCase):
     def test_convert_hex_to_rgb(self):
         hex_color = "#aaaaff"
         rgb: utils.RGB = utils.RGB(170, 170, 255)
+        self.assertEqual(utils.convert_hex_to_rgb(hex_color), rgb)
+
+        hex_color = "#aaaaff01"
+        rgb: utils.RGB = utils.RGB(170, 170, 255, 1)
         self.assertEqual(utils.convert_hex_to_rgb(hex_color), rgb)
     
     def test_add_RGB(self):
@@ -61,7 +67,26 @@ class TestUtils(unittest.TestCase):
         image_info.number_of_images = len(expected)
         actual = utils.make_filename_list(image_info=image_info)
         self.assertEqual(expected, actual)
+    
+    def test_add_add_pixl_colors(self):
+        # The top pixel should take precidence when it has a full opacity
+        c1 = utils.RGB(255, 255, 0, 255)
+        c2 = utils.RGB(255, 0, 0, 255)
+        c_result = utils.add_pixel_colors(c1, c2)
+        self.assertEqual(c_result, c1)
         
+        # The bottom pixel will take precidence when the top pixel has no opacity
+        c1 = utils.RGB(255, 255, 0, 0)
+        c2 = utils.RGB(255, 0, 0, 255)
+        c_result = utils.add_pixel_colors(c1, c2)
+        self.assertEqual(c_result, c2)
+
+        # When they are mixed it is a little harder to determine
+        c1 = utils.RGB(100, 100, 100, 100)
+        c2 = utils.RGB(100, 100, 100, 100)
+        expected = utils.RGB(100, 100,100, 161)
+        c_result = utils.add_pixel_colors(c1, c2)
+        self.assertEqual(c_result, expected)
 
 class TestFileParse(unittest.TestCase):
     def test_line_to_list(self):
@@ -149,7 +174,6 @@ class TestFileParse(unittest.TestCase):
         p2 = vertex.Vertex(1,3)
         p3 = vertex.Vertex(3,1)
         t_points = file_parse.triangle_fill(p1,p2,p3)
-        print(t_points)
         expected = [
             vertex.Vertex(x=1, y=1, r=0, g=0, b=0),
             vertex.Vertex(x=2, y=1, r=0, g=0, b=0),
@@ -162,6 +186,5 @@ class TestFileParse(unittest.TestCase):
         p2 = vertex.Vertex(0,0)
         p3 = vertex.Vertex(0,0)
         t_points = file_parse.triangle_fill(p1,p2,p3)
-        print(t_points)
         expected = []
         self.assertEqual(t_points, expected)

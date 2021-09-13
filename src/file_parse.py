@@ -7,7 +7,7 @@ from src import utils
 import numpy as np
 
 import src.vertex as vertex
-from src.utils import RGB, convert_hex_to_rgb, line_to_list, ImageInfo
+from src.utils import RGB, add_pixel_colors, convert_hex_to_rgb, line_to_list, ImageInfo
 
 
 def get_image_info(line: str) -> ImageInfo:
@@ -138,6 +138,24 @@ def dda_on_vertex(p1: vertex.Vertex, p2: vertex.Vertex, step_in_y: bool = False)
     output = list(map(ndarray_to_vertex, dda_result))
     return output
 
+def add_pixel(vert: vertex.Vertex, image: Image, color: RGB = None) -> None:
+    # check to see if a color has been specified. If now, make color equal to the color of the vert
+    if not color:
+        color = RGB(
+            red=vert.r,
+            green=vert.g,
+            blue=vert.b,
+            alpha=vert.a,
+        )
+    # Get the current value of the pixel in the immage
+    original_color = RGB(*image.getpixel((vert.x, vert.y)))
+    # if the alpha of the currently placed pixel is 0, we can just use our new color.
+    # if the alpha of the currently placed pixel is not 0, we have to use the over operator
+    # to determine the new color and alpha.
+    if original_color.alpha != 0:
+        color: RGB = add_pixel_colors(color, original_color)
+    image.im.putpixel((vert.x, vert.y), (color.red, color.green, color.blue, color.alpha))
+
 def parse_line(line: "list[str]", image: Image, vertex_list: "list[vertex.Vertex]") -> None:
     """
     parse keywords
@@ -154,7 +172,11 @@ def parse_line(line: "list[str]", image: Image, vertex_list: "list[vertex.Vertex
         # make the vertex
         new_vertex = vertex.parse_xyrgb(line)
         vertex_list.append(new_vertex)
-        
+    
+    if keyword == "xyrgba":
+        new_vertex = vertex.parse_xyrgba(line)
+        vertex_list.append(new_vertex)
+
 
     if keyword == "xyc":
         # make the vertex
@@ -165,23 +187,34 @@ def parse_line(line: "list[str]", image: Image, vertex_list: "list[vertex.Vertex
         # linearly interpolate colors
         p1 = vertex_list[int(line[1]) - 1]
         p2 = vertex_list[int(line[2]) - 1]
-        verts = dda(p1, p2)
+        verts: list[vertex.Vertex] = dda_on_vertex(p1, p2)
         for vert in verts:
-            image.im.putpixel((vert.x, vert.y), (vert.r, vert.g, vert.b, 255))
+            add_pixel(vert, image)
     
-    if keyword == "linec":
+    if keyword in ["linec", "lineca"]:
         p1 = vertex_list[int(line[1]) - 1]
         p2 = vertex_list[int(line[2]) - 1]
         hexcolorcode = line[3]
         c: RGB = convert_hex_to_rgb(hexcolorcode)
-        verts = dda(p1, p2)
+        verts: list[vertex.Vertex] = dda_on_vertex(p1, p2)
         for vert in verts:
-            image.im.putpixel((vert.x, vert.y), (c.red, c.green, c.blue, 255))
-    
+            add_pixel(vert, image, c)
+
+
     if keyword == "trig":
         i1 = vertex_list[int(line[1]) - 1]
         i2 = vertex_list[int(line[2]) - 1]
         i3 = vertex_list[int(line[3]) - 1]
+        verts: list[vertex.Vertex] = triangle_fill(i1, i2, i3)
+        for vert in verts:
+            add_pixel(vert, image)
+
+    if keyword in ["tric", "trica"]:
+        i1 = vertex_list[int(line[1]) - 1]
+        i2 = vertex_list[int(line[2]) - 1]
+        i3 = vertex_list[int(line[3]) - 1]
+        hexcolorcode = line[4]
+        c: RGB = convert_hex_to_rgb(hexcolorcode)
         verts = triangle_fill(i1, i2, i3)
         for vert in verts:
-            image.im.putpixel((vert.x, vert.y), (vert.r, vert.g, vert.b, 255))
+            add_pixel(vert, image, c)
