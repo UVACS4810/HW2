@@ -156,6 +156,12 @@ def add_pixel(vert: vertex.Vertex, image: Image, color: RGB = None) -> None:
         color: RGB = add_pixel_colors(color, original_color)
     image.im.putpixel((vert.x, vert.y), (color.red, color.green, color.blue, color.alpha))
 
+def get_vertex_by_index(verts, index) -> vertex.Vertex:
+    # if its a negative index just use that idex
+    if index < 0:
+        return verts[index]
+    return verts[index - 1]
+
 def parse_line(line: "list[str]", image: Image, vertex_list: "list[vertex.Vertex]") -> None:
     """
     parse keywords
@@ -185,15 +191,19 @@ def parse_line(line: "list[str]", image: Image, vertex_list: "list[vertex.Vertex
     
     if keyword == "lineg":
         # linearly interpolate colors
-        p1 = vertex_list[int(line[1]) - 1]
-        p2 = vertex_list[int(line[2]) - 1]
+        p1_index = int(line[1])
+        p2_index = int(line[2])
+        p1 = get_vertex_by_index(vertex_list, p1_index)
+        p2 = get_vertex_by_index(vertex_list, p2_index)
         verts: list[vertex.Vertex] = dda_on_vertex(p1, p2)
         for vert in verts:
             add_pixel(vert, image)
     
     if keyword in ["linec", "lineca"]:
-        p1 = vertex_list[int(line[1]) - 1]
-        p2 = vertex_list[int(line[2]) - 1]
+        p1_index = int(line[1])
+        p2_index = int(line[2])
+        p1 = get_vertex_by_index(vertex_list, p1_index)
+        p2 = get_vertex_by_index(vertex_list, p2_index)
         hexcolorcode = line[3]
         c: RGB = convert_hex_to_rgb(hexcolorcode)
         verts: list[vertex.Vertex] = dda_on_vertex(p1, p2)
@@ -202,17 +212,23 @@ def parse_line(line: "list[str]", image: Image, vertex_list: "list[vertex.Vertex
 
 
     if keyword == "trig":
-        i1 = vertex_list[int(line[1]) - 1]
-        i2 = vertex_list[int(line[2]) - 1]
-        i3 = vertex_list[int(line[3]) - 1]
+        i1_index = int(line[1])
+        i2_index = int(line[2])
+        i3_index = int(line[3])
+        i1 = get_vertex_by_index(vertex_list, i1_index)
+        i2 = get_vertex_by_index(vertex_list, i2_index)
+        i3 = get_vertex_by_index(vertex_list, i3_index)
         verts: list[vertex.Vertex] = triangle_fill(i1, i2, i3)
         for vert in verts:
             add_pixel(vert, image)
 
     if keyword in ["tric", "trica"]:
-        i1 = vertex_list[int(line[1]) - 1]
-        i2 = vertex_list[int(line[2]) - 1]
-        i3 = vertex_list[int(line[3]) - 1]
+        i1_index = int(line[1])
+        i2_index = int(line[2])
+        i3_index = int(line[3])
+        i1 = get_vertex_by_index(vertex_list, i1_index)
+        i2 = get_vertex_by_index(vertex_list, i2_index)
+        i3 = get_vertex_by_index(vertex_list, i3_index)
         hexcolorcode = line[4]
         c: RGB = convert_hex_to_rgb(hexcolorcode)
         verts = triangle_fill(i1, i2, i3)
