@@ -1,2 +1,7 @@
-hw0ex1.txt
-hw0ex2.txt
+hw1demo.txt
+hw1linec.txt
+hw1trig.txt
+hw1lineg.txt
+hw1tric.txt
+hw1rgba.txt
+hw1trica.txt
