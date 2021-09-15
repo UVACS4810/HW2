@@ -241,7 +241,6 @@ def parse_line(line: "list[str]", image: Image, vertex_list: "list[vertex.Vertex
         i1 = get_vertex_by_index(vertex_list, i1_index)
         vertex_color = RGB(i1.r, i1.g, i1.b, i1.a)
         radius = int(line[2])
-        verts = draw_circle(int(i1.x), int(i1.y), radius, vertex_color)
+        verts = draw_circle(round(i1.x), round(i1.y), radius, vertex_color)
         for vert in verts:
-            print(vert)
             add_pixel(vert, image, vertex_color)

@@ -10,23 +10,22 @@ def make_permutations(x_initial, x, y_initial, y, color: RGB):
     v2 = Vertex(x_initial + x, y_initial - y, color.red, color.green, color.blue, color.alpha)
     v3 = Vertex(x_initial - x, y_initial + y, color.red, color.green, color.blue, color.alpha)
     v4 = Vertex(x_initial - x, y_initial - y, color.red, color.green, color.blue, color.alpha)
-    v5 = Vertex(y_initial + y, x_initial + x, color.red, color.green, color.blue, color.alpha)
-    v6 = Vertex(y_initial + y, x_initial - x, color.red, color.green, color.blue, color.alpha)
-    v7 = Vertex(y_initial - y, x_initial + x, color.red, color.green, color.blue, color.alpha)
-    v8 = Vertex(y_initial - y, x_initial - x, color.red, color.green, color.blue, color.alpha)
+    v5 = Vertex(x_initial + y, y_initial + x, color.red, color.green, color.blue, color.alpha)
+    v6 = Vertex(x_initial + y, y_initial - x, color.red, color.green, color.blue, color.alpha)
+    v7 = Vertex(x_initial - y, y_initial + x, color.red, color.green, color.blue, color.alpha)
+    v8 = Vertex(x_initial - y, y_initial - x, color.red, color.green, color.blue, color.alpha)
     
     return [v1, v2, v3, v4, v5, v6, v7, v8]
 def draw_circle(x_initial: int, y_initial: int, radius: int, color: RGB) -> "list[vertex.Vertex]":
     x = -1 * radius
     y = 0
-    p = 0
-    px = -2 * radius + 1
-    py = 1
-    pxx = 2
-    pyy = 2
+    p = -1 * radius - 1
+    px = -8 * radius
+    py = 4
+    pxx = 8
+    pyy = 8
     output = []
-    print(f"x = {x}, y = {y}")
-    while y < -x:
+    while y <= -x:
         print(f"x = {x}, y = {y}")
         output += make_permutations(x_initial, x, y_initial, y, color)
         y += 1
