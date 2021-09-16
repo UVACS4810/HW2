@@ -1,10 +1,12 @@
-from math import exp
+from src.curves import draw_bezier
 import unittest
+from math import exp
 
 import numpy as np
-import src.vertex as vertex
 import src.file_parse as file_parse
+import src.lines as lines
 import src.utils as utils
+import src.vertex as vertex
 
 
 class TestVertex(unittest.TestCase):
@@ -102,12 +104,12 @@ class TestFileParse(unittest.TestCase):
             out = file_parse.line_to_list(line)
             self.assertEqual(out, expected)
 
-
+class TestLines(unittest.TestCase):
     def test_dda(self):
         # test to enseure that only the smaller endpoint will be included
         p1 = vertex.Vertex(10, 10)
         p2 = vertex.Vertex(20, 20)
-        output = file_parse.dda_on_vertex(p1, p2)
+        output = lines.dda_on_vertex(p1, p2)
         has_x_10: bool = False
         has_y_10: bool = False
         for out in output:
@@ -132,7 +134,7 @@ class TestFileParse(unittest.TestCase):
             vertex.Vertex(0,3),
             vertex.Vertex(0,4),
         ]
-        actual = file_parse.dda_on_vertex(p1, p2)
+        actual = lines.dda_on_vertex(p1, p2)
         self.assertEqual(actual, expected)
         p1 = vertex.Vertex(0,.1)
         p2 = vertex.Vertex(0,5)
@@ -142,7 +144,7 @@ class TestFileParse(unittest.TestCase):
             vertex.Vertex(0,3),
             vertex.Vertex(0,4),
         ]
-        actual = file_parse.dda_on_vertex(p1, p2)
+        actual = lines.dda_on_vertex(p1, p2)
         self.assertEqual(actual, expected)
 
         p1 = vertex.Vertex(0,0)
@@ -154,26 +156,26 @@ class TestFileParse(unittest.TestCase):
             vertex.Vertex(3, 0),
             vertex.Vertex(4, 0),
         ]
-        actual = file_parse.dda_on_vertex(p1, p2)
+        actual = lines.dda_on_vertex(p1, p2)
         self.assertEqual(actual, expected)
 
         p1 = vertex.Vertex(0,0)
         p2 = vertex.Vertex(0,0)
         expected = []
-        actual = file_parse.dda_on_vertex(p1, p2)
+        actual = lines.dda_on_vertex(p1, p2)
         self.assertEqual(actual, expected)
 
     def test_vertex_to_ndarray(self):
         v = vertex.Vertex(1,1)
         l = [1,1,0,0,0]
         ll = np.array(l)
-        self.assertEqual(ll.all(), file_parse.vertex_to_ndarray(v).all())
+        self.assertEqual(ll.all(), lines.vertex_to_ndarray(v).all())
 
     def test_triangle_fill(self):
         p1 = vertex.Vertex(1,1)
         p2 = vertex.Vertex(1,3)
         p3 = vertex.Vertex(3,1)
-        t_points = file_parse.triangle_fill(p1,p2,p3)
+        t_points = lines.triangle_fill(p1,p2,p3)
         expected = [
             vertex.Vertex(x=1, y=1, r=0, g=0, b=0),
             vertex.Vertex(x=2, y=1, r=0, g=0, b=0),
@@ -185,6 +187,36 @@ class TestFileParse(unittest.TestCase):
         p1 = vertex.Vertex(0,0)
         p2 = vertex.Vertex(0,0)
         p3 = vertex.Vertex(0,0)
-        t_points = file_parse.triangle_fill(p1,p2,p3)
+        t_points = lines.triangle_fill(p1,p2,p3)
         expected = []
         self.assertEqual(t_points, expected)
+
+    def test_lerp(self):
+        # Testing linear interpolation between np.ndarrays
+        p1 = np.array([0,0,0,0])
+        p2 = np.array([2,2,2,2])
+        t = .5
+        expected = np.array([1,1,1,1])
+        real = lines.lerp(p1, p2, t)
+        self.assertEqual(expected.all(), real.all())
+
+        t = 1
+        expected = np.array([2,2,2,2])
+        real = lines.lerp(p1, p2, t)
+        self.assertEqual(expected.all(), real.all())
+
+        t = 0
+        expected = np.array([0,0,0,0])
+        real = lines.lerp(p1, p2, t)
+        self.assertEqual(expected.all(), real.all())
+
+class TestCurves(unittest.TestCase):
+    def test_draw_bezier_point(self):
+        p1 = vertex.Vertex(0,0)
+        p2 = vertex.Vertex(2, 2)
+        p3 = vertex.Vertex(4,4)
+        p4 = vertex.Vertex(6,0)
+        vertex_list = [p1,p2,p3,p4]
+        result = draw_bezier_point(vertex_list, .5)
+        expected = vertex.Vertex(3, 2)
+        self.assertEqual(result,expected)

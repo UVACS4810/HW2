@@ -3,6 +3,7 @@ from src.utils import RGB
 from src.vertex import Vertex
 
 import src.vertex as vertex
+import src.lines as lines
 from src.utils import RGB
 
 def make_permutations(x_initial, x, y_initial, y, color: RGB):
@@ -35,3 +36,18 @@ def draw_circle(x_initial: int, y_initial: int, radius: int, color: RGB) -> "lis
             p += px
             px += pxx
     return output
+
+def draw_bezier_point(points: "list[Vertex]", u: float):
+    copy_points = list(map(lambda c: lines.vertex_to_ndarray(c), points))
+    for k in range(1, len(points)):
+        for i in range(0, len(points) - k):
+            copy_points[i] = (1-u) * copy_points[i] + u * copy_points[i+1]
+    bezier_point = lines.ndarray_to_vertex(copy_points[0])
+    return bezier_point
+
+def draw_bezier_curve(points: "list[Vertex]", divisions: int = 1000) -> "list[Vertex]":
+    verts = []
+    for i in range(divisions):
+        u = i/float(divisions-1)
+        verts.append(draw_bezier_point(points, u))
+    return verts
