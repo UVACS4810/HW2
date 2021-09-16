@@ -41,6 +41,7 @@ def draw_bezier_point(points: "list[Vertex]", u: float):
     copy_points = list(map(lambda c: lines.vertex_to_ndarray(c), points))
     for k in range(1, len(points)):
         for i in range(0, len(points) - k):
+            
             copy_points[i] = (1-u) * copy_points[i] + u * copy_points[i+1]
     bezier_point = lines.ndarray_to_vertex(copy_points[0])
     return bezier_point

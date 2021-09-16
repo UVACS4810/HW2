@@ -8,3 +8,4 @@ hw1trica.txt
 hw1circle.txt
 hw1cubicc.txt
 hw1beznc.txt
+hw1cubicg.txt

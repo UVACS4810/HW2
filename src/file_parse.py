@@ -163,3 +163,12 @@ def parse_line(line: "list[str]", image: Image, vertex_list: "list[vertex.Vertex
         verts = draw_bezier_curve(control_points)
         for vert in verts:
             add_pixel(vert, image, c)
+    
+    if keyword == "cubicg":
+        i1 = get_vertex_by_index(vertex_list, int(line[1]))
+        i2 = get_vertex_by_index(vertex_list, int(line[2]))
+        i3 = get_vertex_by_index(vertex_list, int(line[3]))
+        i4 = get_vertex_by_index(vertex_list, int(line[4]))
+        verts = draw_bezier_curve([i1,i2,i3,i4])
+        for vert in verts:
+            add_pixel(vert, image)
