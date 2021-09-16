@@ -26,7 +26,6 @@ def draw_circle(x_initial: int, y_initial: int, radius: int, color: RGB) -> "lis
     pyy = 8
     output = []
     while y <= -x:
-        print(f"x = {x}, y = {y}")
         output += make_permutations(x_initial, x, y_initial, y, color)
         y += 1
         p += py

@@ -173,6 +173,9 @@ def parse_line(line: "list[str]", image: Image, vertex_list: "list[vertex.Vertex
     the two vertices given. Ignore the colors of the vertices 
     5) trig i_1, i_2, i_3: Fill a triangle between the given vertices,
     linearly interpolating the vertex colors as you go
+    6) circle i_1 radius: Draw the outline of a circle centered at the given vertex with the given radius.
+    Use the color of the vertex.
+    7) 
     """
     keyword: str = line[0]
     if keyword == "xyrgb":
