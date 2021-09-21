@@ -15,7 +15,7 @@ $(VENV)/bin/activate: requirements.txt
 
 
 clean:
-	rm -rf __pycache__
+	find . | grep -E "(__pycache__|\.pyc)" | xargs rm -rf
 	rm -rf $(VENV)
 
 comp: 
