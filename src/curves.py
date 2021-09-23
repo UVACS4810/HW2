@@ -42,7 +42,7 @@ def draw_bezier_point(points: "list[Vertex]", u: float):
     for k in range(1, len(points)):
         for i in range(0, len(points) - k):
             copy_points[i] = (1-u) * copy_points[i] + u * copy_points[i+1]
-    bezier_point = lines.ndarray_to_vertex(copy_points[0])
+    bezier_point = lines.ndarray_to_vertex(copy_points[0], is_rounded=False)
     return bezier_point
 
 def draw_bezier_curve(points: "list[Vertex]", divisions: int = 1000) -> "list[Vertex]":

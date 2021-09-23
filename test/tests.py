@@ -1,12 +1,11 @@
-from src.curves import draw_bezier
 import unittest
-from math import exp
 
 import numpy as np
 import src.file_parse as file_parse
 import src.lines as lines
 import src.utils as utils
 import src.vertex as vertex
+import src.curves as curves
 
 
 class TestVertex(unittest.TestCase):
@@ -217,6 +216,6 @@ class TestCurves(unittest.TestCase):
         p3 = vertex.Vertex(4,4)
         p4 = vertex.Vertex(6,0)
         vertex_list = [p1,p2,p3,p4]
-        result = draw_bezier_point(vertex_list, .5)
+        result = curves.draw_bezier_point(vertex_list, .5)
         expected = vertex.Vertex(3, 2)
         self.assertEqual(result,expected)

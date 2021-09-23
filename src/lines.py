@@ -5,11 +5,14 @@ import numpy as np
 import src.vertex as vertex
 import src.utils as utils
 
-def ndarray_to_vertex(q: np.ndarray) -> vertex.Vertex:
-    new_vertex: vertex.Vertex = vertex.Vertex(
-            *(np.round(q.tolist()).astype(int))
-        )
-    return new_vertex
+def ndarray_to_vertex(q: np.ndarray, is_rounded: bool = True) -> vertex.Vertex:
+    if is_rounded:
+        return vertex.Vertex(
+                *(np.round(q.tolist()).astype(int))
+            )
+    return vertex.Vertex(
+        *(q.tolist())
+    )
 
 def vertex_to_ndarray(v: vertex.Vertex) -> np.ndarray:
     return np.array(utils.object_to_list(v))

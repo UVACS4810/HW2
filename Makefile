@@ -19,7 +19,7 @@ clean:
 	rm -rf $(VENV)
 
 comp: 
-	compare -fuzz 2% $(file) test/correct_files/$(file) ae.png
+	compare -fuzz 2% $(file) test/correct_files/$(file) test/created_files/$(file)_diff.png
 
 zip: 
 	tar -czvf submission.tar.gz src main.py implemented.txt requirements.txt Makefile
