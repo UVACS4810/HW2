@@ -22,4 +22,4 @@ comp:
 	compare -fuzz 2% $(file) test/correct_files/$(file) ae.png
 
 zip: 
-	tar -czvf submission.tar.gz src implemented.txt requirements.txt Makefile
+	tar -czvf submission.tar.gz src main.py implemented.txt requirements.txt Makefile
