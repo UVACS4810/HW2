@@ -16,7 +16,7 @@ $(VENV)/bin/activate: requirements.txt
 
 clean:
 	find . | grep -E "(__pycache__|\.pyc)" | xargs rm -rf
-	rm -rf $(VENV)
+	rm -rf $(VENV) submission.tar.gz
 
 comp: 
 	compare -fuzz 2% $(file) test/correct_files/$(file) test/created_files/$(file)_diff.png
